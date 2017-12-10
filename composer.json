@@ -1,5 +1,5 @@
 {
-	"name": "mufkuw/entity",
+	"name": "mufkuw/entities",
 	"description": "Description of project entity.",
 	"authors": [
 		{
@@ -14,7 +14,7 @@
 			"src/bootstrap.php"
 		],
 		"psr-4": {
-			"Mvc\\": "src/"
+			"Entities\\": "src/"
 		}
 	}
 }

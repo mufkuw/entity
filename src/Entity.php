@@ -1,5 +1,7 @@
 <?php
 
+namespace Entities;
+
 global $entities_class_index;
 
 abstract class Entity {

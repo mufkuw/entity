@@ -1,5 +1,7 @@
 <?php
 
+namespace Entities;
+
 abstract class Model {
 
 	public $forcedID = 0;

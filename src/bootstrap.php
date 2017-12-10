@@ -1,5 +1,7 @@
 <?php
 
+namespace Entities;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -15,9 +17,9 @@
  * @param 'database' => ''
  * @param 'username' => ''
  * @param 'password' => ''
- * @param 'models_path' => './models'
- * @param 'entities_path' => './entities'
- * @param 'cache_path' => './entities_classes'
+ * @param 'models_path' => 'models'
+ * @param 'entities_path' => 'entities'
+ * @param 'cache_path' => 'entities_classes'
  * @param 'events_hook' => null
  *
  *
@@ -29,9 +31,9 @@ function entities_init($pSetup) {
 		'database' => '',
 		'username' => '',
 		'password' => '',
-		'models_path' => './models',
-		'entities_path' => './entities',
-		'cache_path' => './entities_classes',
+		'models_path' => 'models',
+		'entities_path' => 'entities',
+		'cache_path' => 'entities_classes',
 		'events_hook' => null
 	]);
 
@@ -44,7 +46,9 @@ function entities_init($pSetup) {
 	}
 	require_once './src/Entity.php';
 	require_once './src/Model.php';
+
 	Entity::init($pSetup);
+
 	spl_autoload_register(function($class) {
 		global $entities_class_index;
 		if (isset($entities_class_index[$class])) {
