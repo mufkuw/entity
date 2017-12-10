@@ -1,0 +1,20 @@
+{
+	"name": "mufkuw/entity",
+	"description": "Description of project entity.",
+	"authors": [
+		{
+			"name": "Muffaddal Kalla",
+			"email": "mufkuw@gmail.com"
+		}
+	],
+	"require": {},
+
+	"autoload": {
+		"files": [
+			"src/bootstrap.php"
+		],
+		"psr-4": {
+			"Mvc\\": "src/"
+		}
+	}
+}
