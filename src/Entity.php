@@ -4,6 +4,8 @@ namespace Entities;
 
 global $entities_class_index;
 
+use PDO;
+
 abstract class Entity {
 
 	public static $sql;
@@ -142,7 +144,14 @@ abstract class Entity {
 
 		$pSetup = self::$setup;
 
-		$file_entity_base = $pSetup['cache_path'] . '/Entities.php';
+		$cache_path = $pSetup['cache_path'] . '/entities';
+
+		if (!file_exists($cache_path)) {
+			mkdir($cache_path, 0777, true);
+		}
+
+
+		$file_entity_base = $cache_path . '/Entities.php';
 
 		if (self::index_exists($file_entity_base)) {
 			//require_once(realpath($file_entity_base));
@@ -151,6 +160,7 @@ abstract class Entity {
 			$code = "";
 			// <editor-fold defaultstate="collapsed" desc="Entity Base Codes, Replace \\[CLASS_INSTANCE_FUNCTIONS]">
 			$code .= "<?php\n\n
+			namespace Entities;
 			class Entities {
 
 				private static function getEntityInstance(\$name)
@@ -195,7 +205,7 @@ abstract class Entity {
 		}
 
 		$association = [];
-		$file_association = $pSetup['cache_path'] . '/TableAssociation.php';
+		$file_association = $cache_path . '/TableAssociation.php';
 
 		$file_association_exists = self::index_exists($file_association);
 
@@ -208,7 +218,7 @@ abstract class Entity {
 			$modelname = ucwords(EntityInflector::singularize(EntityInflector::camelize($table)));
 			$entityname = ucwords(EntityInflector::camelize($table));
 
-			$file = $pSetup['cache_path'] . '/TableInfo' . ucwords($entityname) . '.php';
+			$file = $cache_path . '/TableInfo' . ucwords($entityname) . '.php';
 			if (self::index_exists($file)) {
 				$table_desc = self::index_get($file);
 			} else {
@@ -256,15 +266,15 @@ abstract class Entity {
 			$auto_gen_entity_class_name = 'AutoGen' . $entity_class_name;
 			$auto_gen_model_class_name = 'AutoGen' . $model_class_name;
 
-			$file_table_info = $pSetup['cache_path'] . '/TableInfo' . ucwords($entity_name) . '.php';
+			$file_table_info = $cache_path . '/TableInfo' . ucwords($entity_name) . '.php';
 			$table_desc = self::index_get($file_table_info);
 
-			$file = $pSetup['cache_path'] . "/$auto_gen_model_class_name.php";
+			$file = $cache_path . "/$auto_gen_model_class_name.php";
 			if (self::index_exists($file)) {
 				$entities_class_index[$auto_gen_model_class_name] = $file;
 				//require_once(realpath($file));
 			} else {
-				$code = "<?php class $auto_gen_model_class_name extends Model {\n";
+				$code = "<?php namespace Entities; class $auto_gen_model_class_name extends Model {\n";
 				foreach ($table_desc as $column) {
 					$code .= "\n\tpublic \${$column['column_name']} = '{$column['column_default']}';";
 				}
@@ -306,11 +316,11 @@ abstract class Entity {
 			}
 
 
-			$file = $pSetup['cache_path'] . "/$auto_gen_entity_class_name.php";
+			$file = $cache_path . "/$auto_gen_entity_class_name.php";
 			if (self::index_exists($file)) {
 				$entities_class_index[$auto_gen_entity_class_name] = $file;
 			} else {
-				$code = "<?php class $auto_gen_entity_class_name extends Entity { ";
+				$code = "<?php namespace Entities; class $auto_gen_entity_class_name extends Entity { ";
 
 				if (isset(self::$associations[$entity_class_name])) {
 					foreach (self::$associations[$entity_class_name] as $column => $assocation) {
@@ -382,7 +392,7 @@ abstract class Entity {
 			if (self::index_exists($file)) {
 				$entities_class_index[$entity_class_name] = $file;
 			} else {
-				$code = "<?php class $entity_class_name extends $auto_gen_entity_class_name {\n}";
+				$code = "<?php namespace Entities; class $entity_class_name extends $auto_gen_entity_class_name {\n}";
 				self::code_generate($code, $file);
 				$entities_class_index[$entity_class_name] = $file;
 			}
@@ -394,7 +404,7 @@ abstract class Entity {
 				$entities_class_index[$model_class_name] = $file;
 			} else {
 
-				$code = "<?php class $model_class_name extends $auto_gen_model_class_name {\n}";
+				$code = "<?php namespace Entities; class $model_class_name extends $auto_gen_model_class_name {\n}";
 				self::code_generate($code, $file);
 				$entities_class_index[$model_class_name] = $file;
 			}
@@ -414,8 +424,14 @@ abstract class Entity {
 	}
 
 	private static function get_tables() {
+
+		$pSetup = self::$setup;
+
+		$cache_path = $pSetup['cache_path'] . '/entities';
+
+
 		//Collecting Table Info
-		$file = self::$setup['cache_path'] . '/EntityTables.php';
+		$file = $cache_path . '/EntityTables.php';
 
 		if (!self::$tables) {
 			if (self::index_exists($file)) {

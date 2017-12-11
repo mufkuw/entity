@@ -44,8 +44,8 @@ function entities_init($pSetup) {
 	if (file_exists(realpath($file_entity_base))) {
 		require_once $file_entity_base;
 	}
-	require_once './src/Entity.php';
-	require_once './src/Model.php';
+	require_once 'Entity.php';
+	require_once 'Model.php';
 
 	Entity::init($pSetup);
 
