@@ -91,6 +91,11 @@ abstract class Entity {
 
 	public function __construct() {
 		$class = get_called_class();
+
+		$class_map = explode("\\", $class);
+
+		$class = $class_map[count($class_map) - 1];
+
 		$this->table_name = EntityInflector::delimit(substr($class, 0, -6));
 		$this->model_class = EntityInflector::singularize(substr($class, 0, -6)) . 'Model';
 
@@ -155,7 +160,7 @@ abstract class Entity {
 
 		if (self::index_exists($file_entity_base)) {
 			//require_once(realpath($file_entity_base));
-			$entities_class_index['Entities'] = $file_entity_base;
+			$entities_class_index['Entities\\Entities'] = $file_entity_base;
 		} else {
 			$code = "";
 			// <editor-fold defaultstate="collapsed" desc="Entity Base Codes, Replace \\[CLASS_INSTANCE_FUNCTIONS]">
@@ -166,7 +171,7 @@ abstract class Entity {
 				private static function getEntityInstance(\$name)
 				{
 					try {
-						\$class = str_replace('_', '', ucwords(strtolower(\$name), '_')) . 'Entity';
+						\$class =  'Entities\\\\'.str_replace('_', '', ucwords(strtolower(\$name), '_')) . 'Entity';
 						if (class_exists(\$class)) {
 							\$instance = \$class::instance();
 
@@ -201,7 +206,7 @@ abstract class Entity {
 
 			self::code_generate($code, $file_entity_base);
 			//require_once(realpath($file_entity_base));
-			$entities_class_index['Entities'] = $file_entity_base;
+			$entities_class_index['Entities\\Entities'] = $file_entity_base;
 		}
 
 		$association = [];
@@ -271,7 +276,7 @@ abstract class Entity {
 
 			$file = $cache_path . "/$auto_gen_model_class_name.php";
 			if (self::index_exists($file)) {
-				$entities_class_index[$auto_gen_model_class_name] = $file;
+				$entities_class_index['Entities\\' . $auto_gen_model_class_name] = $file;
 				//require_once(realpath($file));
 			} else {
 				$code = "<?php namespace Entities; class $auto_gen_model_class_name extends Model {\n";
@@ -312,13 +317,13 @@ abstract class Entity {
 
 				$code .= '}';
 				self::code_generate($code, $file);
-				$entities_class_index[$auto_gen_model_class_name] = $file;
+				$entities_class_index['Entities\\' . $auto_gen_model_class_name] = $file;
 			}
 
 
 			$file = $cache_path . "/$auto_gen_entity_class_name.php";
 			if (self::index_exists($file)) {
-				$entities_class_index[$auto_gen_entity_class_name] = $file;
+				$entities_class_index['Entities\\' . $auto_gen_entity_class_name] = $file;
 			} else {
 				$code = "<?php namespace Entities; class $auto_gen_entity_class_name extends Entity { ";
 
@@ -385,28 +390,28 @@ abstract class Entity {
 				$code .= '}';
 				self::code_generate($code, $file);
 
-				$entities_class_index[$auto_gen_entity_class_name] = $file;
+				$entities_class_index['Entities\\' . $auto_gen_entity_class_name] = $file;
 			}
 
 			$file = $pSetup['entities_path'] . "/$entity_class_name.php";
 			if (self::index_exists($file)) {
-				$entities_class_index[$entity_class_name] = $file;
+				$entities_class_index['Entities\\' . $entity_class_name] = $file;
 			} else {
 				$code = "<?php namespace Entities; class $entity_class_name extends $auto_gen_entity_class_name {\n}";
 				self::code_generate($code, $file);
-				$entities_class_index[$entity_class_name] = $file;
+				$entities_class_index['Entities\\' . $entity_class_name] = $file;
 			}
 
 
 
 			$file = $pSetup['models_path'] . "/$model_class_name.php";
 			if (self::index_exists($file)) {
-				$entities_class_index[$model_class_name] = $file;
+				$entities_class_index['Entities\\' . $model_class_name] = $file;
 			} else {
 
 				$code = "<?php namespace Entities; class $model_class_name extends $auto_gen_model_class_name {\n}";
 				self::code_generate($code, $file);
-				$entities_class_index[$model_class_name] = $file;
+				$entities_class_index['Entities\\' . $model_class_name] = $file;
 			}
 		}
 	}
@@ -507,7 +512,7 @@ abstract class Entity {
 
 	public function get($pWhere = "1=1", $pFields = '*', $params = null, $start = 0, $length = 0) {
 		$sql = "select $pFields from $this->table_name where $pWhere";
-		return self::select($sql, NULL, 0, 0, $this->model_class);
+		return self::select($sql, NULL, $start, $length, $this->model_class);
 	}
 
 	public function getByID($pID) {
@@ -590,7 +595,7 @@ abstract class Entity {
 			if ($model == '')
 				$data = $resource->fetchAll(PDO::FETCH_ASSOC);
 			else
-				$data = $resource->fetchAll(PDO::FETCH_CLASS, $model);
+				$data = $resource->fetchAll(PDO::FETCH_CLASS, 'Entities\\' . $model);
 			$resource->closeCursor();
 			$resource = null;
 			return $data;
@@ -691,7 +696,7 @@ abstract class Entity {
 
 	public function get_table_info() {
 		$entityname = EntityInflector::camelize($this->table_name);
-		$file = self::$setup['cache_path'] . '/TableInfo' . $entityname . '.php';
+		$file = self::$setup['cache_path'] . '/entities/TableInfo' . $entityname . '.php';
 		$table_info = self::index_get($file);
 		return $table_info;
 	}
